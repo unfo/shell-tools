@@ -1,0 +1,31 @@
+#!/bin/bash
+#
+### This script prints the description of my shell scripts
+#
+# The short description of the script should be prefixed with
+# three # marks as above on line 3.
+#
+# That short form is used with desc -all.
+# The entire thing until a blank line is read by desc <filename>
+#
+#USE: desc <filename>
+#USE: desc -all
+#
+# 2014-07-08 :: jw :: created
+
+
+if [ "$#" -ne 1 ]; then
+    fgrep '#USE' $0 | fgrep -v fgrep
+    exit 1;
+fi
+
+BASEDIR=$(dirname $(which $0))
+
+if [ "$1" == "-all" ]; then
+    for filename in $(ls -1 $BASEDIR/*)
+    do
+        printf "%-30s|%s\n" "$(basename $filename)" "$(fgrep -m 1 '###' $filename | tr -d '#')"
+    done
+else
+    $BASEDIR/print_until "^$" $BASEDIR/$1
+fi

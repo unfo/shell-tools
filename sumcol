@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+### Sum arbitrary columns
+#
+#USE: r_sum <column> [optional arguments to awk]
+#
+# Example:
+#  cat some.csv | sumcol 2 -F ';'
+#  ls -l | sumcol 5
+#
+# 2014-07-08 :: jw
+
+if [ "$#" -eq 0 ]; then
+	fgrep '#USE' $0 | fgrep -v fgrep
+	exit 1
+fi
+
+col=$1
+shift
+
+awk -v col=$col  "$@" '{ sum += $(col) } END { print sum }'

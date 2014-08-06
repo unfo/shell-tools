@@ -1,0 +1,4 @@
+#!/bin/sh
+### Show used memory in addition to the user/system time
+
+/usr/bin/time -f '%Uu %Ss %er %MkB %C' "$@"

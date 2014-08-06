@@ -1,0 +1,7 @@
+#!/bin/bash
+#
+### Finds NULL bytes (0x00) in <file> or STDIN
+#
+# Author: jw / 2014-06-11
+
+grep --color='auto' -P "[\x00]" "$@"

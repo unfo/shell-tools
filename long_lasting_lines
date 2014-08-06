@@ -1,0 +1,53 @@
+#!/bin/env ruby
+#
+### Prints all lines whose timestamp difference is greater than <threshold> (default 10 sec)
+#
+# 2014-04-03 :: jw
+
+require 'date'
+
+THRESHOLD = ARGV[0].to_i || 10 # seconds
+prev_line = ''
+prev_dtm = nil
+prev_line_printed = false
+
+def seconds_between(dtm1, dtm2)
+  seconds_in_a_day = 24 * 60 * 60
+  ((dtm2 - dtm1) * seconds_in_a_day).round # dtm - dtm is a Rational of how many days
+end
+
+def humanize(seconds)
+  hours = seconds / (60*60)
+  seconds -= (hours * 60*60)
+  minutes = seconds / 60
+  seconds -= (minutes * 60)
+  '%02d:%02d:%02d' % [hours,minutes,seconds]
+end
+
+STDIN.each_line do |line|
+  timestamp_str = line.scan(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/)
+
+  next if timestamp_str.nil? || timestamp_str.empty?
+
+
+  dtm = DateTime.parse(timestamp_str.first)
+
+  unless prev_dtm.nil?
+    secs = seconds_between(prev_dtm, dtm)
+    if secs > THRESHOLD
+      unless prev_line_printed
+        puts
+        puts " "*9 + prev_line
+      end
+
+      puts humanize(secs) + " " + line
+      prev_line_printed = true
+    else
+      prev_line_printed = false
+    end
+
+  end
+
+  prev_dtm = dtm
+  prev_line = line
+end

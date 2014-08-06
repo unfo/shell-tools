@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+### Checks if $1 has Windows (\r\n) or Linux (\n) line endings
+#
+#USE: eol <file>
+#
+# 2013-04-23 :: jw
+
+if [ "$#" -ne 1 ]; then
+    fgrep '#USE' $0 | fgrep -v fgrep
+    exit 1;
+fi
+
+grep -r $'\r' -l $1 > /dev/null
+
+if [ $? -eq 0 ]; then
+	echo "Windows"
+else
+	echo "Linux"
+fi

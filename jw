@@ -1,0 +1,4 @@
+#!/bin/bash
+### Some bashrc stuff for proper init of env.
+export VISUAL=vim
+export PS1="\t \h $SPECIAL_ENV \w \$ "

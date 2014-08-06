@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+### Prints filename patterns in current dir with some naive filtering
+#
+# 2014-01-20 :: jw
+# 2014-07-08 :: jw :: description
+# 2014-08-04 :: jw :: find singular patterns too
+
+ls -f1 | grep -Ev '^\.{1,2}$' | sed -r 's/[0-9]{3,}.*//' | sort | uniq

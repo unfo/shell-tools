@@ -1,0 +1,88 @@
+#!/bin/sh
+#
+### Highlights delimited data to make it more readable in terminal.
+#
+# Optional parameters $1 = delimiter $2 color palette.
+# e.g cat my.csv | happy_csv ";" xxxxRGB
+# will color semicolon delimited fields 5,6 and 7 with bright
+# red/green/blue
+#
+# 2014-06-09 :: Erik Granholm
+# 2014-07-08 :: jw :: fix for awk missing 'switch' in some cases
+
+
+# parameter default values
+DELIM=";";
+PALETTE="RGBCYMrgbcymRGBCYMrgbcymRGBCYMrgbcymRGBCYMrgbcymRGBCYMrgbcymRGBCYMrgbcymRGBCYMrgbcymRGBCYMrgbcymRGBCYMrgbcymRGBCYMrgbcymRGBCYMrgbcym";
+
+
+# optional parameters
+if [ $# -ge 1 ]; then
+	DELIM=$1;
+	if [ $# -eq 2 ]; then
+		PALETTE=$2;
+	fi
+fi
+
+
+gawk -v DELIM="$DELIM" -F "$DELIM" -v PALETTE=$PALETTE '
+BEGIN{ OFS=DELIM; IFS=DELIM}
+
+# converts char c into bash color code
+#
+# r/R -> red/light red
+# g/G -> green/light green
+# b/B -> blue/light blue
+# y/Y -> yellow/light yellow
+# m/M -> magenta/light magenta
+# c/C -> cyan/light cyan
+#
+function atoc(c)
+{
+	if 		(c == "r") 			return "\033[31m";
+	else if (c == "R") 			return "\033[91m";
+	else if (c == "g") 			return "\033[32m";
+	else if (c == "G") 			return "\033[92m";
+	else if (c == "b") 			return "\033[34m";
+	else if (c == "B") 			return "\033[94m";
+	else if (c == "y") 			return "\033[33m";
+	else if (c == "Y") 			return "\033[93m";
+	else if (c == "m") 			return "\033[35m";
+	else if (c == "M") 			return "\033[95m";
+	else if (c == "c") 			return "\033[36m";
+	else if (c == "C") 			return "\033[96m";
+	else return "";
+}
+
+
+# remove all color and formatting attributes
+#
+function rmattr()
+{
+	return "\033[0m";
+}
+
+
+# color $line delimited by $delimiter with $palette
+#
+function print_clr(line, palette, delimiter)
+{
+	for(i=1; i<=NF; i++){
+		OUTSTRING = "";
+		# add color code
+		OUTSTRING = OUTSTRING "" atoc(substr(palette, i, 1));
+		# add field
+		OUTSTRING = OUTSTRING "" $i;
+		# remove color attributes
+		OUTSTRING = OUTSTRING "" rmattr();
+		# add delimiter
+		$i = OUTSTRING
+	}
+
+	# My rainbow -csv brings all the boys to the yard
+	print
+}
+
+print_clr($0, PALETTE, DELIM);
+
+END{}'

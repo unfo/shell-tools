@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+### Sums the sizes of a given list of files
+#
+#USE: ls -l | sumls
+#USE: r_ls -2 | xargs ls -l | sumls
+#USE: find . -type f -mtime +5 ! -name '*.bz2' -print0 | xargs -0 ls -l | sumls
+#
+# 2013-08-20 :: jw
+# 2014-07-08 :: jw :: use cases
+
+awk '{ sum += $5 } END { print "total: " (sum / 1024 / 1024) " MB" } '

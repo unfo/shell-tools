@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+### Check if all rows have the same number of columns as the header
+# You can give the delimiter as first arg, default is semi-colon.
+# The script can read from file or piped output
+#
+#USE: csv_check [delimeter] [filename]
+#
+# Author: jw / 2013-06-05
+
+
+DELIM=';'
+if [ "$1" != "" ]; then
+    line=$1
+    len=${#line}
+	if [ "$len" -eq "1" ]; then
+    		shift
+		DELIM=$line
+	fi
+fi
+awk -F "$DELIM" 'BEGIN { headerNF = 0 } { if (headerNF == 0) { headerNF = NF }; if (NF != headerNF) { print NR ": " $0 } } ' "$@"

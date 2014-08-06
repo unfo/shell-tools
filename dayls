@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+### Prints files for a given relative day (0, -1, -2, ...)
+#
+# 0 = today # this is also the default
+# -1 = yesterday
+# -2 = day before yesterday
+#
+# 2014-05-09 :: jw
+
+DAY_1=0
+if [ $# -eq 1 ]; then
+	DAY_1=$1
+fi
+
+DAY_2=$(($DAY_1 + 1))
+
+dtm_1=$(date -d "$DAY_1 day" +%Y-%m-%d)
+dtm_2=$(date -d "$DAY_2 day" +%Y-%m-%d)
+
+find . -type f -newermt $dtm_1 ! -newermt $dtm_2

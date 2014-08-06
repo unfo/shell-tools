@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+### Prints first line and lines matching <pattern> from <file>
+#
+#USE: r_head_grep <pattern> <file>
+#
+# 2014-04-07 :: jw
+
+if [ "$#" -eq 0 ]; then
+	fgrep '#USE' $0 | fgrep -v fgrep
+	exit 1;
+fi
+
+awk -v pattern=$1 'NR == 1 || $0 ~ pattern' $2

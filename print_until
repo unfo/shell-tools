@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+### Print lines until <pattern> is matched in <file> or STDIN
+#
+#USE: print_until <pattern> [file]
+#
+# 2014-07-08 :: jw :: created
+
+if [ "$#" -eq 0 ]; then
+	fgrep '#USE' $0 | fgrep -v fgrep
+	exit 1
+fi
+
+PATTERN=$1
+shift
+
+awk -v pattern="$PATTERN" 'BEGIN { found=0 } { if (found < 1) { print }; if ($0 ~ pattern) { found = 1; } }' "$@"

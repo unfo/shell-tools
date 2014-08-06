@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+### Safely edit crontab + get diff of changes
+#
+# 2013-01-23 :: jw
+
+before=$(mktemp /tmp/$(whoami)_crontab_before.XXXXX)
+after=$(mktemp /tmp/$(whoami)_crontab_after.XXXXX)
+crontab -l > $before
+crontab -e
+crontab -l > $after
+diff $before $after
+
+rm $before
+rm $after

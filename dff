@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+### Legible df formatting for long names
+#
+# 2013-08-21 :: jw
+
+
+df -Ph | column -t

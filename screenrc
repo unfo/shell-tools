@@ -1,0 +1,30 @@
+### A fairly good default screen configuration
+startup_message off
+altscreen on
+term screen-256color
+
+defscrollback 10000
+
+bind ',' prev # ^a,
+bind '.' next # ^a.
+bindkey -k k1 prev 		# f1
+bindkey -k k2 next 		# f2
+bindkey -k k3 screen 	# f3
+
+bindkey -k k5 copy 		# f5
+
+backtick 1 30 30 uptime
+
+hardstatus alwayslastline
+hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%1`][%{B} %Y-%m-%d %{W}%c %{g}]'
+
+shelltitle "$ |bash"
+defnonblock 1
+nonblock 5
+vbell off
+termcapinfo xterm* hs:ts=\E]0;:fs=\007:ds=\E]0;\007
+screen -t general
+screen -t general
+screen -t psql
+screen -t data
+window 0

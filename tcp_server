@@ -1,0 +1,115 @@
+#!/usr/bin/env ruby
+#
+### Simple socket server listening on <PORT> that writes <MB> megabytes and then sleeps for <SECONDS>
+#
+# Sends the connecting client data and logs how long it took => get speed.
+#
+#USE: tcp_server <read/write> <HOST> <PORT> <MB> <SEC>
+#USE: tcp_server read 127.0.0.1 30000 1024 60
+#USE: tcp_server write localhost 30000 1024 60
+#
+# author :: 2014-07-28 :: jw
+
+require 'socket'
+require 'benchmark'
+
+puts ARGV.inspect
+
+READ = ARGV[0] == "read"
+HOST = ARGV[1].to_s
+PORT = ARGV[2].to_i
+MB = ARGV[3].to_i
+SLEEP = ARGV[4].to_i
+
+CHUNK_SIZE = 1024*1024 # 1 MB
+
+def log(msg)
+	puts "%s %s" % [Time.now, msg]
+end
+
+def generate_data(bytes=42) 
+  #puts "requested #{bytes} bytes of random data"
+  "A" * bytes # guaranteed to be random ;)
+end
+
+def bytes_to_mb(bytes)
+  (bytes / (1024*1024)).floor
+end
+
+unless PORT > 0 && MB > 0 && SLEEP > 0
+	puts `fgrep USE #{__FILE__} | fgrep -v fgrep`
+	exit 1
+end
+
+
+server = TCPServer.new(HOST, PORT) unless READ
+
+
+log "Connection on #{HOST}:#{PORT} (read = #{READ})"
+
+
+loop do
+  log "Trying connection"
+  client = nil
+  until client do
+    if READ
+      print "."
+      STDOUT.flush
+      client = TCPSocket.new(HOST, PORT) rescue nil
+      sleep 1
+    else
+      log "Opening listening socket"
+      client = server.accept
+    end
+  end
+  puts ""
+  log "Got connection"
+  bytes = 0
+  max_bytes = MB * 1024 * 1024
+
+  log "%s #{max_bytes} bytes" % [READ ? "Reading" : "Writing"]
+  
+  time_start = Time.now
+  
+  begin
+    while bytes < max_bytes 
+      if READ
+        if client.eof?
+          log "Reading reached EOF"
+          break
+        end
+        data = client.read(CHUNK_SIZE)
+        bytes += data.length unless data.nil?
+      else
+        bytes += client.write generate_data(CHUNK_SIZE)
+      end
+    end
+  rescue => e
+    log "There was a problem with the connection"
+    log e
+    log "-------------------------"
+  end
+
+  ms = ((Time.now - time_start) * 1000).to_i
+  sec =  (ms / 1000.0).ceil
+  sec = 1 if sec < 1
+  log "Request: #{MB*1024*1024} bytes (#{MB} MB)}"
+  log "Actual : #{bytes} bytes (#{bytes_to_mb(bytes)} MB)"
+  log "Took   : #{ms} ms"
+  speed = bytes / sec
+  speed_mb = bytes_to_mb(speed)
+  log "Speed  : #{speed} bytes / s"
+  log "Speed  : #{speed_mb} MBytes / s"
+
+  log "Closing client"
+  until client.closed?
+    client.close
+    log "Client %s closed" % (client.closed? ? "is" : "is not")
+    sleep 1
+  end
+  log "Waiting #{SLEEP} seconds and repeating"
+  sleep SLEEP if READ
+end
+
+
+
