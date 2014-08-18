@@ -2,7 +2,7 @@
 
 TARGET=$1
 AS_NAMES=$2 # wget http://bgp.potaroo.net/cidr/autnums.html
-tracelog=$(mktemp /tmp/trace-$1.XXXXX})
+tracelog=$(mktemp /tmp/trace-$1.XXXXX)
 traceroute -a -I $1 | tee -a $tracelog
 
 
